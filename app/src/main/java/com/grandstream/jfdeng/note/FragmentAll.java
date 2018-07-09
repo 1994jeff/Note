@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -18,6 +19,20 @@ import java.util.List;
  */
 
 public class FragmentAll extends Fragment {
+
+    interface FinishSetArgs{
+        void onFinish(Fragment fragment);
+    }
+
+    FinishSetArgs finishSetArgs;
+
+    public FinishSetArgs getFinishSetArgs() {
+        return finishSetArgs;
+    }
+
+    public void setFinishSetArgs(FinishSetArgs finishSetArgs) {
+        this.finishSetArgs = finishSetArgs;
+    }
 
     private ListView mListItem;
     private MyAdapter mAdapter;
@@ -43,6 +58,17 @@ public class FragmentAll extends Fragment {
         mAdapter = new MyAdapter(getActivity(),list);
         mListItem = (ListView) view.findViewById(R.id.list_item);
         mListItem.setAdapter(mAdapter);
+        mListItem.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                FragmentAdd fragmentAdd = new FragmentAdd();
+                Bundle args = new Bundle();
+                args.putInt("id",mAdapter.getItemNoteId(i));
+                fragmentAdd.setArguments(args);
+                if(finishSetArgs!=null)
+                finishSetArgs.onFinish(fragmentAdd);
+            }
+        });
     }
 
 

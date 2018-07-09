@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener ,FragmentAll.FinishSetArgs{
 
     private TextView mAll;
     private TextView mAdd;
@@ -27,7 +27,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAdd = (TextView) findViewById(R.id.add);
         mAdd.setOnClickListener(this);
 
-        switchFragment(new FragmentAll());
+        FragmentAll all = new FragmentAll();
+        all.setFinishSetArgs(this);
+        switchFragment(all);
     }
 
     private void switchFragment(Fragment fragment) {
@@ -41,11 +43,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.all:
-                switchFragment(new FragmentAll());
+                FragmentAll all = new FragmentAll();
+                all.setFinishSetArgs(this);
+                switchFragment(all);
                 break;
             case R.id.add:
                 switchFragment(new FragmentAdd());
                 break;
         }
+    }
+
+
+    @Override
+    public void onFinish(Fragment fragment) {
+        switchFragment(fragment);
     }
 }

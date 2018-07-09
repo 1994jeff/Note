@@ -46,15 +46,13 @@ public class FragmentAdd extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState==null)
-            return;
-        Bundle bundle = savedInstanceState.getBundle("note");
-        if(bundle!=null){
-            noteId = bundle.getInt("id");
-        }
     }
 
     private void initView(View view) {
+        Bundle bundle = getArguments();
+        if(bundle!=null){
+            noteId = bundle.getInt("id");
+        }
 
         mHelper = new DataBaseHelper(getActivity(),"notes.db",null,1);
         db = mHelper.getReadableDatabase();
@@ -81,6 +79,7 @@ public class FragmentAdd extends Fragment {
     }
 
     private void load() {
+        if(noteId==-1) return;
         String sql = "select * from notes where id=?";
         Cursor cursor = db.rawQuery(sql,new String[]{noteId+""});
         while (cursor!=null && cursor.moveToNext()){

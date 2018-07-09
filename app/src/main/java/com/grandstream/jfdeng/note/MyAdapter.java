@@ -1,6 +1,7 @@
 package com.grandstream.jfdeng.note;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,10 @@ public class MyAdapter extends BaseAdapter {
         return i;
     }
 
+    public int getItemNoteId(int i){
+        return mList.get(i).getId();
+    }
+
     @Override
     public View getView(int i, View view, ViewGroup group) {
 
@@ -49,11 +54,14 @@ public class MyAdapter extends BaseAdapter {
         if(view==null){
             view = LayoutInflater.from(mContext).inflate(R.layout.item_notes, group, false);
             holder = new ViewHolder(view);
+            view.setTag(holder);
         }else {
             holder = (ViewHolder) view.getTag();
         }
+        Log.i("jeff",(mList==null)+""+","+(mList.get(i).toString()));
         holder.mTitle.setText(mList.get(i).getTitle());
         holder.mDate.setText(mList.get(i).getDate());
+        holder.mCheckbox.setVisibility(View.GONE);
         if(status[i]){
             holder.mCheckbox.setChecked(true);
         }else {
