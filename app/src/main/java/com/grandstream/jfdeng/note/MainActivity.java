@@ -1,21 +1,16 @@
 package com.grandstream.jfdeng.note;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ListView;
+import android.view.View;
+import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-public class MainActivity extends AppCompatActivity {
-
-    private ListView mListItem;
-    private MyAdapter mAdapter;
-
-    DataBaseHelper mHelper;
-    SQLiteDatabase db;
+    private TextView mAll;
+    private TextView mAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,36 +19,33 @@ public class MainActivity extends AppCompatActivity {
         initView();
     }
 
+
     private void initView() {
 
-        mHelper = new DataBaseHelper(this,"notes.db",null,1);
-        db = mHelper.getReadableDatabase();
+        mAll = (TextView) findViewById(R.id.all);
+        mAll.setOnClickListener(this);
+        mAdd = (TextView) findViewById(R.id.add);
+        mAdd.setOnClickListener(this);
 
-        List<Note> list = getData();
-        mAdapter = new MyAdapter(this,list);
-        mListItem = (ListView) findViewById(R.id.list_item);
+        switchFragment(new FragmentAll());
+    }
 
+    private void switchFragment(Fragment fragment) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.container,fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        db.close();
-    }
-
-    private List<Note> getData() {
-        List<Note> list = new ArrayList<>();
-        String sql = "select * from notes";
-        Cursor cursor = db.rawQuery(sql,null);
-        Note note = null;
-        while (cursor!=null && cursor.moveToNext()){
-            int id = cursor.getInt(cursor.getColumnIndex("id"));
-            String title = cursor.getString(cursor.getColumnIndex("title"));
-            String content = cursor.getString(cursor.getColumnIndex("content"));
-            String date = cursor.getString(cursor.getColumnIndex("date"));
-            note = new Note(id,title,content,date);
-            list.add(note);
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.all:
+                switchFragment(new FragmentAll());
+                break;
+            case R.id.add:
+                switchFragment(new FragmentAdd());
+                break;
         }
-        return list;
     }
 }
