@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,31 @@ import java.util.List;
  */
 
 public class FragmentAll extends Fragment {
+
+    List<Note> list;
+
+    public void dropData() {
+        boolean[] status = mAdapter.getStatus();
+        int hasCheckItem = -1;
+        for(int i=list.size()-1;i>=0;i--){
+            if(status[i]){
+                status[i] = false;
+                deleteNote(list.get(i).getId());
+                list.remove(i);
+                hasCheckItem = 1;
+            }
+        }
+        if(hasCheckItem<0){
+            Toast.makeText(getActivity(),"请选择要删除的日记！",Toast.LENGTH_SHORT).show();
+        }else {
+            mAdapter.hideAllCheckBox();
+        }
+    }
+
+    private void deleteNote(int id) {
+        String sql = "delete from notes where id=?";
+        db.execSQL(sql,new String[]{id+""});
+    }
 
     interface FinishSetArgs{
         void onFinish(Fragment fragment);
@@ -54,7 +80,7 @@ public class FragmentAll extends Fragment {
         mHelper = new DataBaseHelper(getActivity(),"notes.db",null,1);
         db = mHelper.getReadableDatabase();
 
-        List<Note> list = getData();
+        list = getData();
         mAdapter = new MyAdapter(getActivity(),list);
         mListItem = (ListView) view.findViewById(R.id.list_item);
         mListItem.setAdapter(mAdapter);
@@ -69,8 +95,20 @@ public class FragmentAll extends Fragment {
                 finishSetArgs.onFinish(fragmentAdd);
             }
         });
+        mListItem.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> view, View view1, int i, long l) {
+                mAdapter.showAllCheckBox();
+                return true;
+            }
+        });
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        db.close();
+    }
 
     private List<Note> getData() {
         List<Note> list = new ArrayList<>();
@@ -85,7 +123,6 @@ public class FragmentAll extends Fragment {
             note = new Note(id,title,content,date);
             list.add(note);
         }
-        db.close();
         return list;
     }
 }

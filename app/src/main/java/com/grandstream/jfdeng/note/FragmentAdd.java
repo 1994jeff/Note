@@ -34,6 +34,8 @@ public class FragmentAdd extends Fragment {
     int noteId = -1;
     Note note;
 
+    SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日 hh:mm:ss");
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -79,20 +81,24 @@ public class FragmentAdd extends Fragment {
     }
 
     private void load() {
-        if(noteId==-1) return;
-        String sql = "select * from notes where id=?";
-        Cursor cursor = db.rawQuery(sql,new String[]{noteId+""});
-        while (cursor!=null && cursor.moveToNext()){
-            int id = cursor.getInt(cursor.getColumnIndex("id"));
-            String title = cursor.getString(cursor.getColumnIndex("title"));
-            String content = cursor.getString(cursor.getColumnIndex("content"));
-            String date = cursor.getString(cursor.getColumnIndex("date"));
-            note = new Note(id,title,content,date);
+        if(noteId!=-1)
+        {
+            String sql = "select * from notes where id=?";
+            Cursor cursor = db.rawQuery(sql,new String[]{noteId+""});
+            while (cursor!=null && cursor.moveToNext()){
+                int id = cursor.getInt(cursor.getColumnIndex("id"));
+                String title = cursor.getString(cursor.getColumnIndex("title"));
+                String content = cursor.getString(cursor.getColumnIndex("content"));
+                String date = cursor.getString(cursor.getColumnIndex("date"));
+                note = new Note(id,title,content,date);
+            }
         }
         if(note!=null){
             mTitle.setText(note.getTitle());
             mTime.setText(note.getDate());
             mContent.setText(note.getContent());
+        }else {
+            mTime.setText(format.format(new Date()));
         }
     }
 
@@ -121,9 +127,14 @@ public class FragmentAdd extends Fragment {
             return false;
         }
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日");
-        String sql = "insert into notes(title,content,date) values('"+titleString+"','"+contentString+"','"+format.format(new Date())+"')";
-        db.execSQL(sql);
+        if(noteId==-1)
+        {
+            String sql = "insert into notes(title,content,date) values('"+titleString+"','"+contentString+"','"+format.format(new Date())+"')";
+            db.execSQL(sql);
+        }else {
+            String sql = "update notes set title='"+titleString+"',content='"+contentString+"',date='"+format.format(new Date())+"' where id="+noteId;
+            db.execSQL(sql);
+        }
 
         return true;
     }

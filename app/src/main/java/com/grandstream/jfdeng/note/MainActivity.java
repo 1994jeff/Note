@@ -4,8 +4,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener ,FragmentAll.FinishSetArgs{
 
@@ -32,10 +36,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switchFragment(all);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.action_settings){
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
+            if(fragment instanceof FragmentAll){
+                FragmentAll all = (FragmentAll) fragment;
+                all.dropData();
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void switchFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.container,fragment);
-        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commitAllowingStateLoss();
     }
 

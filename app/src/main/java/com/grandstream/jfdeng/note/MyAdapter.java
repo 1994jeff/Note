@@ -21,6 +21,24 @@ public class MyAdapter extends BaseAdapter {
     Context mContext;
     List<Note> mList;
     boolean[] status;
+    boolean isShowCheckBox;
+
+    public void showAllCheckBox(){
+        isShowCheckBox = true;
+        this.notifyDataSetChanged();
+    }
+
+    public void hideAllCheckBox(){
+        isShowCheckBox = false;
+        for(int i=0;i<status.length;i++){
+            status[i] = false;
+        }
+        this.notifyDataSetChanged();
+    }
+
+    public boolean[] getStatus(){
+        return status;
+    }
 
     public MyAdapter(Context mContext, List<Note> mList) {
         this.mContext = mContext;
@@ -48,7 +66,7 @@ public class MyAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup group) {
+    public View getView(final int i, View view, ViewGroup group) {
 
         ViewHolder holder = null;
         if(view==null){
@@ -58,15 +76,28 @@ public class MyAdapter extends BaseAdapter {
         }else {
             holder = (ViewHolder) view.getTag();
         }
-        Log.i("jeff",(mList==null)+""+","+(mList.get(i).toString()));
         holder.mTitle.setText(mList.get(i).getTitle());
         holder.mDate.setText(mList.get(i).getDate());
-        holder.mCheckbox.setVisibility(View.GONE);
-        if(status[i]){
-            holder.mCheckbox.setChecked(true);
+        if(isShowCheckBox){
+            holder.mCheckbox.setVisibility(View.VISIBLE);
         }else {
-            holder.mCheckbox.setChecked(false);
+            holder.mCheckbox.setVisibility(View.GONE);
         }
+        if(!status[i]){
+            holder.mCheckbox.setChecked(false);
+        }else {
+            holder.mCheckbox.setChecked(true);
+        }
+        holder.mCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton button, boolean b) {
+                if(b){
+                    status[i] = true;
+                }else {
+                    status[i] = false;
+                }
+            }
+        });
         return view;
     }
 
